@@ -9,9 +9,10 @@ import SwiftUI
 
 @main
 struct TestCacheVideoApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+	@StateObject var scorewindData = ScorewindData()
+	var body: some Scene {
+		WindowGroup {
+			ContentView().environmentObject(scorewindData)
+		}
+	}
 }

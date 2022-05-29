@@ -11,6 +11,8 @@
 		C82EAD2E283E11BE00373C4F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82EAD2D283E11BE00373C4F /* ContentView.swift */; };
 		C82EAD30283E11C100373C4F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C82EAD2F283E11C100373C4F /* Assets.xcassets */; };
 		C82EAD33283E11C100373C4F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C82EAD32283E11C100373C4F /* Preview Assets.xcassets */; };
+		C82EAD3A283E122D00373C4F /* ScorewindData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82EAD39283E122D00373C4F /* ScorewindData.swift */; };
+		C82EAD3C283E1FBD00373C4F /* LessonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82EAD3B283E1FBD00373C4F /* LessonView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +21,8 @@
 		C82EAD2D283E11BE00373C4F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C82EAD2F283E11C100373C4F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C82EAD32283E11C100373C4F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C82EAD39283E122D00373C4F /* ScorewindData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScorewindData.swift; sourceTree = "<group>"; };
+		C82EAD3B283E1FBD00373C4F /* LessonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +59,8 @@
 				C82EAD2D283E11BE00373C4F /* ContentView.swift */,
 				C82EAD2F283E11C100373C4F /* Assets.xcassets */,
 				C82EAD31283E11C100373C4F /* Preview Content */,
+				C82EAD39283E122D00373C4F /* ScorewindData.swift */,
+				C82EAD3B283E1FBD00373C4F /* LessonView.swift */,
 			);
 			path = TestCacheVideo;
 			sourceTree = "<group>";
@@ -139,6 +145,8 @@
 			files = (
 				C82EAD2E283E11BE00373C4F /* ContentView.swift in Sources */,
 				C82EAD2C283E11BE00373C4F /* TestCacheVideoApp.swift in Sources */,
+				C82EAD3C283E1FBD00373C4F /* LessonView.swift in Sources */,
+				C82EAD3A283E122D00373C4F /* ScorewindData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,6 +283,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -304,6 +313,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
