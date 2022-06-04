@@ -63,6 +63,8 @@ struct ContentView: View {
 								Text ("downloaded")
 									.foregroundColor(Color.green)
 							}*/
+							
+							
 							if checkDownloadStatus(lessonID: testItem.id) == 0 {
 								Text("not in queue")
 									.foregroundColor(Color.gray)
@@ -76,6 +78,7 @@ struct ContentView: View {
 								Text ("downloaded")
 									.foregroundColor(Color.green)
 							}
+							//Text ("downloaded").foregroundColor(checkDownloadStatus(lessonID: testItem.id) == 0 ? Color.gray : Color.green)
 							
 							Spacer()
 						}
