@@ -44,7 +44,7 @@ struct ContentView: View {
 							Spacer().frame(width:10)
 							Button("Download it") {
 								print("download it")
-								scorewindData.downloadVideo(URL(string: scorewindData.decodeVideoURL(videoURL: testItem.videoMP4))!, lessonID: testItem.id)
+								scorewindData.videoDownloadTask(URL(string: scorewindData.decodeVideoURL(videoURL: testItem.videoMP4))!, lessonID: testItem.id)
 							}
 							
 							Spacer().frame(width:10)

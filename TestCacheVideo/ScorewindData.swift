@@ -14,6 +14,7 @@ class ScorewindData: ObservableObject {
 	@Published var videoPlayer:AVPlayer?
 	var cachedURL: URL?
 	@Published var downloadList = [DownloadItem()]
+	var swDownloadTask:URLSessionDownloadTask?
 	
 	init() {
 		
@@ -60,37 +61,6 @@ class ScorewindData: ObservableObject {
 		return decodedURL
 	}
 	
-	/*func downloadVideo(_ url: URL, lessonID: Int) {
-		let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-		let destinationUrl = docsUrl?.appendingPathComponent(url.lastPathComponent)
-		print("dest:\(destinationUrl!.path)")
-		let dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
-			guard
-				error == nil,
-				let httpResponse = response as? HTTPURLResponse,
-				200 ..< 300 ~= httpResponse.statusCode,
-				let data = data
-			else {
-				return
-			}
-			
-			DispatchQueue.main.async {
-				do {
-					try data.write(to: destinationUrl!, options: Data.WritingOptions.atomic)
-					
-					DispatchQueue.main.async {
-						print("downloaded")
-					}
-				} catch let error {
-					print("Error decoding: ", error)
-				}
-			}
-			
-
-		}
-		
-		dataTask.resume()
-	}*/
 	func downloadVideo(_ url: URL, lessonID: Int) {
 		downloadList.append(DownloadItem(lessonID: lessonID, downloadStatus: 1))
 		
@@ -128,14 +98,76 @@ class ScorewindData: ObservableObject {
 				}
 			}
 			
-
+			
 		}
 		
 		dataTask.resume()
 	}
 	
+	func videoDownloadTask(_ url:URL, lessonID: Int) {
+		DispatchQueue.main.async {
+			self.downloadList.append(DownloadItem(lessonID: lessonID, downloadStatus: 1))
+			let findDownloadItemIndex = self.downloadList.firstIndex(where: {$0.lessonID == lessonID}) ?? -1
+			if findDownloadItemIndex >= 0 {
+				self.downloadList[findDownloadItemIndex].downloadStatus = 2
+				
+			}
+		}
+		
+		print("[debug] before calling downloadTask")
+		swDownloadTask = URLSession.shared.downloadTask(with: url) {
+			urlOrNil, responseOrNil, errorOrNil in
+			// check for and handle errors:
+			// * errorOrNil should be nil
+			// * responseOrNil should be an HTTPURLResponse with statusCode in 200..<299
+			
+			guard let fileURL = urlOrNil else { return }
+			do {
+				/*let documentsURL = try
+				 FileManager.default.url(for: .documentDirectory,
+				 in: .userDomainMask,
+				 appropriateFor: nil,
+				 create: false)*/
+				//let savedURL = documentsURL.appendingPathComponent(fileURL.lastPathComponent)
+				let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+				let destinationUrl = docsUrl!.appendingPathComponent(url.lastPathComponent)
+				print("[debug] fileURL:\(fileURL.path)")
+				print("[debug] destinationUrl:\(destinationUrl.path)")
+				try FileManager.default.moveItem(at: fileURL, to: destinationUrl)
+				print("[debug] moved to document folder.")
+				
+				DispatchQueue.main.async {
+					let findDownloadItemIndex = self.downloadList.firstIndex(where: {$0.lessonID == lessonID}) ?? -1
+					if findDownloadItemIndex >= 0 {
+						self.downloadList[findDownloadItemIndex].downloadStatus = 3
+					}
+				}
+				
+			} catch {
+				print ("[debug] file error: \(error)")
+			}
+		}
+		
+		swDownloadTask!.resume()
+	}
+	
+	func downloadAll() {
+		for item in testVideos {
+			downloadList.append(DownloadItem(lessonID: item.id, downloadStatus: 1))
+		}
+		
+		if !downloadList.isEmpty {
+			let getDownloadTarget = downloadList.first(where: {$0.downloadStatus == 1})!
+			
+			if !getDownloadTarget!.isEmpty {
+				videoDownloadTask(<#T##url: URL##URL#>, lessonID: getDownloadTarget?.lessonID)
+			}
+		}
+	}
 	
 }
+
+
 
 struct TestVideo: Hashable {
 	var id = 0
