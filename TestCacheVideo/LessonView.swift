@@ -27,13 +27,25 @@ struct LessonView: View {
 		.onAppear(perform: {
 			print("LessonView onappear")
 			setupPlayer()
-			playerStatus = scorewindData.currentTestVideo.videom3u8
 		})
 	}
 	
 	private func setupPlayer() {
 		let interval = CMTime(seconds: 0.5,preferredTimescale: CMTimeScale(NSEC_PER_SEC))
-		scorewindData.videoPlayer = AVPlayer(url: URL(string:scorewindData.currentTestVideo.videom3u8)!)
+		var playVideo = URL(string:scorewindData.currentTestVideo.videom3u8)!
+		let playVideoMP4 = URL(string: scorewindData.decodeVideoURL(videoURL: scorewindData.currentTestVideo.videoMP4))!
+		
+		let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+		let destinationUrl = docsUrl?.appendingPathComponent(playVideoMP4.lastPathComponent)
+		
+		if FileManager.default.fileExists(atPath: destinationUrl!.path) {
+			playVideo = playVideoMP4
+			playerStatus = destinationUrl!.path
+		} else {
+			playerStatus = scorewindData.currentTestVideo.videom3u8
+		}
+		
+		scorewindData.videoPlayer = AVPlayer(url: playVideo)
 		scorewindData.videoPlayer!.addPeriodicTimeObserver(forInterval: interval, queue: .main) {
 			time in
 			

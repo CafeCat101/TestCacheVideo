@@ -60,7 +60,7 @@ class ScorewindData: ObservableObject {
 		return decodedURL
 	}
 	
-	func downloadVideo(_ url: URL) {
+	/*func downloadVideo(_ url: URL, lessonID: Int) {
 		let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
 		let destinationUrl = docsUrl?.appendingPathComponent(url.lastPathComponent)
 		print("dest:\(destinationUrl!.path)")
@@ -80,6 +80,48 @@ class ScorewindData: ObservableObject {
 					
 					DispatchQueue.main.async {
 						print("downloaded")
+					}
+				} catch let error {
+					print("Error decoding: ", error)
+				}
+			}
+			
+
+		}
+		
+		dataTask.resume()
+	}*/
+	func downloadVideo(_ url: URL, lessonID: Int) {
+		downloadList.append(DownloadItem(lessonID: lessonID, downloadStatus: 1))
+		
+		let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+		let destinationUrl = docsUrl?.appendingPathComponent(url.lastPathComponent)
+		print("dest:\(destinationUrl!.path)")
+		
+		let findDownloadItemIndex = downloadList.firstIndex(where: {$0.lessonID == lessonID}) ?? -1
+		if findDownloadItemIndex >= 0 {
+			downloadList[findDownloadItemIndex].downloadStatus = 2
+		}
+		
+		let dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
+			guard
+				error == nil,
+				let httpResponse = response as? HTTPURLResponse,
+				200 ..< 300 ~= httpResponse.statusCode,
+				let data = data
+			else {
+				return
+			}
+			
+			DispatchQueue.main.async {
+				do {
+					try data.write(to: destinationUrl!, options: Data.WritingOptions.atomic)
+					
+					DispatchQueue.main.async {
+						print("downloaded")
+						if findDownloadItemIndex >= 0 {
+							self.downloadList[findDownloadItemIndex].downloadStatus = 3
+						}
 					}
 				} catch let error {
 					print("Error decoding: ", error)

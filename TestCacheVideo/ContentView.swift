@@ -44,26 +44,11 @@ struct ContentView: View {
 							Spacer().frame(width:10)
 							Button("Download it") {
 								print("download it")
-								scorewindData.downloadVideo(URL(string: scorewindData.decodeVideoURL(videoURL: testItem.videoMP4))!)
+								scorewindData.downloadVideo(URL(string: scorewindData.decodeVideoURL(videoURL: testItem.videoMP4))!, lessonID: testItem.id)
 							}
 							
 							Spacer().frame(width:10)
 							Text("status:")
-							/*
-							if checkDownloadStatus(theList: scorewindData.downloadList, lessonID: testItem.id) == 0 {
-								Text("not in queue")
-									.foregroundColor(Color.gray)
-							} else if checkDownloadStatus(theList: scorewindData.downloadList, lessonID: testItem.id) == 1 {
-								Text("in queue")
-									.foregroundColor(Color.pink)
-							} else if checkDownloadStatus(theList: scorewindData.downloadList, lessonID: testItem.id) == 2 {
-								Text("downloading")
-									.foregroundColor(Color.blue)
-							} else if checkDownloadStatus(theList: scorewindData.downloadList, lessonID: testItem.id) == 3 {
-								Text ("downloaded")
-									.foregroundColor(Color.green)
-							}*/
-							
 							
 							if checkDownloadStatus(lessonID: testItem.id) == 0 {
 								Text("not in queue")
@@ -78,7 +63,6 @@ struct ContentView: View {
 								Text ("downloaded")
 									.foregroundColor(Color.green)
 							}
-							//Text ("downloaded").foregroundColor(checkDownloadStatus(lessonID: testItem.id) == 0 ? Color.gray : Color.green)
 							
 							Spacer()
 						}
@@ -99,7 +83,7 @@ struct ContentView: View {
 					.tag("TLesson")
 			}
 		}
-		.onAppear(perform: {
+		/*.onAppear(perform: {
 			DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
 				scorewindData.downloadList.append(DownloadItem(lessonID: 2, downloadStatus: 1))
 			}
@@ -118,41 +102,17 @@ struct ContentView: View {
 				}
 				
 			}
-		})
+		})*/
 		
 	}
 	
-	/*private func checkDownloadStatus(theList:[DownloadItem],lessonID:Int) -> Int {
-		var downloadStatus = 0 //0:not in queue, 1:waiting, 2:downloading, 3:downloaded
-		for theItem in theList {
-			if lessonID == theItem.lessonID {
-				downloadStatus = theItem.downloadStatus
-				break
-			}
-		}
-		return downloadStatus
-	}*/
-	
 	private func checkDownloadStatus(lessonID:Int) -> Int {
+		//tested: view can be rerendered without placing ObservedObject in the parameter.
 		var getDownloadStatus = 0 //0:not in queue, 1:waiting, 2:downloading, 3:downloaded
 		if let findIndex = scorewindData.downloadList.firstIndex(where: {$0.lessonID == lessonID}) {
 			getDownloadStatus = scorewindData.downloadList[findIndex].downloadStatus
 		}
 		return getDownloadStatus
-	}
-	
-	private func downloadVideos() {
-		let remoteURL = URL(string: "https://scorewind.com/wp-content/uploads/2021/02/01-Ricardo-1St-Lesson.mp4")!
-		let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-		let targetURL = documentURL.appendingPathComponent(remoteURL.lastPathComponent)
-		print("[debug] download des:\(targetURL.path)")
-		
-
-		let downloadTask = URLSession.shared.downloadTask(with: remoteURL) { url, response, error in
-				guard let tempURL = url else { return }
-				_ = try? FileManager.default.replaceItemAt(targetURL, withItemAt: tempURL)
-		}
-		downloadTask.resume()
 	}
 	
 }
