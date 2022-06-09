@@ -18,23 +18,8 @@ class ScorewindData: ObservableObject {
 	@Published var downloadRunning = false
 	
 	init() {
-		
+		//id2: 10MB
 		testVideos = [
-			TestVideo(
-				id:1,
-				title:"Introduction to &#8216;Guitar Method (Demo): First Position Foundations&#8217;",
-				videoMP4:"https://scorewind.com/wp-content/uploads/2021/02/01-Ricardo-1St-Lesson.mp4",
-				videom3u8:"https://scorewind.com/wp-content/uploads/2021/02/01-Ricardo-1St-Lesson.m3u8"),
-			TestVideo(
-				id:2,
-				title:"C major Scale in First Position One Octave &#8211; Guitar Exercises",
-				videoMP4:"https://scorewind.com/sw-music/pdfProject/Sheet12119/12119 3731 C Major Scale.mp4",
-				videom3u8:"https://scorewind.com/sw-music/pdfProject/Sheet12119/12119_3731_C_Major_Scale.m3u8"),
-			TestVideo(
-				id:3,
-				title:"Introduction to &#8216;Violin Method (Demo): Basis for Even Sounding Bow Strokes&#8217;",
-				videoMP4:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.mp4",
-				videom3u8:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.m3u8"),
 			TestVideo(
 				id:4,
 				title:"Bow Workout &#8211; Open String Playing &#8211; Violin Exercise",
@@ -46,10 +31,25 @@ class ScorewindData: ObservableObject {
 				videoMP4:"https://scorewind.com/sw-music/pdfProject/Sheet13579/13579 01 Guitar 101 Parts of the Instrument Timing Corrected.mp4",
 				videom3u8:"https://scorewind.com/sw-music/pdfProject/Sheet13579/13579_01_Guitar_101_Parts_of_the_Instrument_Timing_Corrected.m3u8"),
 			TestVideo(
+				id:2,
+				title:"C major Scale in First Position One Octave &#8211; Guitar Exercises",
+				videoMP4:"https://scorewind.com/sw-music/pdfProject/Sheet12119/12119 3731 C Major Scale.mp4",
+				videom3u8:"https://scorewind.com/sw-music/pdfProject/Sheet12119/12119_3731_C_Major_Scale.m3u8"),
+			TestVideo(
 				id:6,
 				title:"V101.1.1 &#8211; Introduction to Violin &#8211; Parts of the Violin",
 				videoMP4:"https://scorewind.com/sw-music/pdfProject/Sheet13597/01 - Violin 101 - Introduction to violin - parts of the violin.mp4",
-				videom3u8:"https://scorewind.com/sw-music/pdfProject/Sheet13597/01_-_Violin_101_-_Introduction_to_violin_-_parts_of_the_violin.m3u8")]
+				videom3u8:"https://scorewind.com/sw-music/pdfProject/Sheet13597/01_-_Violin_101_-_Introduction_to_violin_-_parts_of_the_violin.m3u8"),
+			TestVideo(
+				id:1,
+				title:"Introduction to &#8216;Guitar Method (Demo): First Position Foundations&#8217;",
+				videoMP4:"https://scorewind.com/wp-content/uploads/2021/02/01-Ricardo-1St-Lesson.mp4",
+				videom3u8:"https://scorewind.com/wp-content/uploads/2021/02/01-Ricardo-1St-Lesson.m3u8"),
+			TestVideo(
+				id:3,
+				title:"Introduction to &#8216;Violin Method (Demo): Basis for Even Sounding Bow Strokes&#8217;",
+				videoMP4:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.mp4",
+				videom3u8:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.m3u8")]
 		/*testVideos = [
 			TestVideo(
 				id:3,
@@ -189,12 +189,15 @@ class ScorewindData: ObservableObject {
 						
 						guard let fileURL = urlOrNil else {
 							DispatchQueue.main.async {
-								self.downloadList[findDownloadItemIndex].downloadStatus = 1
-								let checkRemainingTargets = self.downloadList.filter({$0.downloadStatus == 1})
-								if !checkRemainingTargets.isEmpty {
-									self.downloadVideos()
-								} else {
-									self.downloadRunning = false
+								if !self.downloadList.isEmpty {
+									//make sure it's not canceled ahead of this time.
+									self.downloadList[findDownloadItemIndex].downloadStatus = 1
+									let checkRemainingTargets = self.downloadList.filter({$0.downloadStatus == 1})
+									if !checkRemainingTargets.isEmpty {
+										self.downloadVideos()
+									} else {
+										self.downloadRunning = false
+									}
 								}
 							}
 							return
@@ -208,23 +211,27 @@ class ScorewindData: ObservableObject {
 							print("[debug] moved to document folder.")
 							
 							DispatchQueue.main.async {
-								self.downloadList[findDownloadItemIndex].downloadStatus = 3
-								let checkRemainingTargets = self.downloadList.filter({$0.downloadStatus == 1})
-								if !checkRemainingTargets.isEmpty {
-									self.downloadVideos()
+								if !self.downloadList.isEmpty {
+									self.downloadList[findDownloadItemIndex].downloadStatus = 3
+									let checkRemainingTargets = self.downloadList.filter({$0.downloadStatus == 1})
+									if !checkRemainingTargets.isEmpty {
+										self.downloadVideos()
+									}
 								}
 							}
 							
 						} catch {
 							print ("[debug] file error: \(error)")
 							DispatchQueue.main.async {
-								self.downloadList[findDownloadItemIndex].downloadStatus = 1
-								
-								let checkRemainingTargets = self.downloadList.filter({$0.downloadStatus == 1})
-								if !checkRemainingTargets.isEmpty {
-									self.downloadVideos()
-								} else {
-									self.downloadRunning = false
+								if !self.downloadList.isEmpty {
+									// in betaApp, needs to find the solution to prevent it from update downloadStatus at wrong item, because the cancel button will remove all downloadItem with that courseID, not just empty the downloadList.
+									self.downloadList[findDownloadItemIndex].downloadStatus = 1
+									let checkRemainingTargets = self.downloadList.filter({$0.downloadStatus == 1})
+									if !checkRemainingTargets.isEmpty {
+										self.downloadVideos()
+									} else {
+										self.downloadRunning = false
+									}
 								}
 							}
 						}
@@ -237,8 +244,8 @@ class ScorewindData: ObservableObject {
 	}
 	
 	func cancelDownloads(){
-		downloadList = []
 		swDownloadTask?.cancel()
+		downloadList = []
 		downloadRunning = false
 	}
 }

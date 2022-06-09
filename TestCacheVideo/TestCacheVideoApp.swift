@@ -19,7 +19,11 @@ struct TestCacheVideoApp: App {
 						print("app is active")
 						if !scorewindData.downloadList.isEmpty {
 							//=>need to check "downloading" video, if they don't have file in document folder, mark them "in queue" so they can be downloaded again.
-							scorewindData.downloadList = scorewindData.downloadList.map({$0.downloadStatus == 2 ?? DownloadItem(lessonID: $0.lessonID, downloadStatus: 1)})
+							for (index, _) in scorewindData.downloadList.enumerated() {
+								if scorewindData.downloadList[index].downloadStatus == 2 {
+									scorewindData.downloadList[index].downloadStatus = 1
+								}
+							}
 							scorewindData.downloadVideos()
 						}
 					} else if newPhase == .inactive {

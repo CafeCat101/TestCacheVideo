@@ -21,25 +21,28 @@ struct ContentView: View {
 				
 				Spacer().frame(height:5)
 				
-				Button("Download all") {
-					print("download all")
-					if scorewindData.downloadList.isEmpty {
-						for video in scorewindData.testVideos {
-							scorewindData.downloadList.append(DownloadItem(lessonID: video.id, downloadStatus: 1))
+				HStack {
+					Button("Download all") {
+						print("download all")
+						if scorewindData.downloadList.isEmpty {
+							for video in scorewindData.testVideos {
+								scorewindData.downloadList.append(DownloadItem(lessonID: video.id, downloadStatus: 1))
+							}
+						}
+						if !scorewindData.downloadList.isEmpty {
+							scorewindData.downloadVideos()
 						}
 					}
-					if !scorewindData.downloadList.isEmpty {
-						scorewindData.downloadVideos()
+					
+					Spacer().frame(width:20)
+					if scorewindData.downloadRunning {
+						Button("Cancel") {
+							print("Cancel")
+							scorewindData.cancelDownloads()
+						}
 					}
 				}
 				
-				Spacer().frame(width:20)
-				if scorewindData.downloadRunning {
-					Button("Cancel") {
-						print("Cancel")
-						scorewindData.cancelDownloads()
-					}
-				}
 				
 				Spacer().frame(height:20)
 				
