@@ -50,22 +50,6 @@ class ScorewindData: ObservableObject {
 				title:"Introduction to &#8216;Violin Method (Demo): Basis for Even Sounding Bow Strokes&#8217;",
 				videoMP4:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.mp4",
 				videom3u8:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.m3u8")]
-		/*testVideos = [
-			TestVideo(
-				id:3,
-				title:"Introduction to &#8216;Violin Method (Demo): Basis for Even Sounding Bow Strokes&#8217;",
-				videoMP4:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.mp4",
-				videom3u8:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.m3u8"),
-			TestVideo(
-				id:4,
-				title:"Bow Workout &#8211; Open String Playing &#8211; Violin Exercise",
-				videoMP4:"https://scorewind.com/sw-music/pdfProject/Sheet12127/3711 12127 Bow Workout Open String Playing.mp4",
-				videom3u8:"https://scorewind.com/sw-music/pdfProject/Sheet12127/3711_12127_Bow_Workout_Open_String_Playing.m3u8"),
-			TestVideo(
-				id:5,
-				title:"G101.1.1 &#8211; Learning the Parts of the Instrument",
-				videoMP4:"https://scorewind.com/sw-music/pdfProject/Sheet13579/13579 01 Guitar 101 Parts of the Instrument Timing Corrected.mp4",
-				videom3u8:"https://scorewind.com/sw-music/pdfProject/Sheet13579/13579_01_Guitar_101_Parts_of_the_Instrument_Timing_Corrected.m3u8")]*/
 		
 		currentTestVideo = testVideos[0]
 		
@@ -180,7 +164,7 @@ class ScorewindData: ObservableObject {
 					downloadList[findDownloadItemIndex].downloadStatus = 2
 					downloadRunning = true
 					let url = URL(string: decodeVideoURL(videoURL: findLesson!.videoMP4))!
-					
+					//=>!!! in betaApp. need to make sure the mp4 doesn't exist before calling URLSession
 					swDownloadTask = URLSession.shared.downloadTask(with: url) {
 						urlOrNil, responseOrNil, errorOrNil in
 						// check for and handle errors:
