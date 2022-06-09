@@ -23,6 +23,14 @@ struct ContentView: View {
 				
 				Button("Download all") {
 					print("download all")
+					if scorewindData.downloadList.isEmpty {
+						for video in scorewindData.testVideos {
+							scorewindData.downloadList.append(DownloadItem(lessonID: video.id, downloadStatus: 1))
+						}
+					}
+					if !scorewindData.downloadList.isEmpty {
+						scorewindData.downloadVideos()
+					}
 				}
 				
 				Spacer().frame(height:20)
