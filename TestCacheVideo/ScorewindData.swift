@@ -15,6 +15,7 @@ class ScorewindData: ObservableObject {
 	var cachedURL: URL?
 	@Published var downloadList = [DownloadItem()]
 	var swDownloadTask:URLSessionDownloadTask?
+	@Published var downloadRunning = false
 	
 	init() {
 		
@@ -177,6 +178,7 @@ class ScorewindData: ObservableObject {
 				if findLesson != nil {
 					print("[debug] before calling downloadTask")
 					downloadList[findDownloadItemIndex].downloadStatus = 2
+					downloadRunning = true
 					let url = URL(string: decodeVideoURL(videoURL: findLesson!.videoMP4))!
 					
 					swDownloadTask = URLSession.shared.downloadTask(with: url) {
@@ -185,14 +187,19 @@ class ScorewindData: ObservableObject {
 						// * errorOrNil should be nil
 						// * responseOrNil should be an HTTPURLResponse with statusCode in 200..<299
 						
-						guard let fileURL = urlOrNil else { return }
+						guard let fileURL = urlOrNil else {
+							DispatchQueue.main.async {
+								self.downloadList[findDownloadItemIndex].downloadStatus = 1
+								let checkRemainingTargets = self.downloadList.filter({$0.downloadStatus == 1})
+								if !checkRemainingTargets.isEmpty {
+									self.downloadVideos()
+								} else {
+									self.downloadRunning = false
+								}
+							}
+							return
+						}
 						do {
-							/*let documentsURL = try
-							 FileManager.default.url(for: .documentDirectory,
-							 in: .userDomainMask,
-							 appropriateFor: nil,
-							 create: false)*/
-							//let savedURL = documentsURL.appendingPathComponent(fileURL.lastPathComponent)
 							let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
 							let destinationUrl = docsUrl!.appendingPathComponent(url.lastPathComponent)
 							print("[debug] fileURL:\(fileURL.path)")
@@ -202,15 +209,22 @@ class ScorewindData: ObservableObject {
 							
 							DispatchQueue.main.async {
 								self.downloadList[findDownloadItemIndex].downloadStatus = 3
-								self.downloadVideos()
+								let checkRemainingTargets = self.downloadList.filter({$0.downloadStatus == 1})
+								if !checkRemainingTargets.isEmpty {
+									self.downloadVideos()
+								}
 							}
 							
 						} catch {
 							print ("[debug] file error: \(error)")
 							DispatchQueue.main.async {
 								self.downloadList[findDownloadItemIndex].downloadStatus = 1
-								if !self.downloadList.isEmpty {
+								
+								let checkRemainingTargets = self.downloadList.filter({$0.downloadStatus == 1})
+								if !checkRemainingTargets.isEmpty {
 									self.downloadVideos()
+								} else {
+									self.downloadRunning = false
 								}
 							}
 						}
@@ -222,6 +236,11 @@ class ScorewindData: ObservableObject {
 		}
 	}
 	
+	func cancelDownloads(){
+		downloadList = []
+		swDownloadTask?.cancel()
+		downloadRunning = false
+	}
 }
 
 

@@ -33,6 +33,14 @@ struct ContentView: View {
 					}
 				}
 				
+				Spacer().frame(width:20)
+				if scorewindData.downloadRunning {
+					Button("Cancel") {
+						print("Cancel")
+						scorewindData.cancelDownloads()
+					}
+				}
+				
 				Spacer().frame(height:20)
 				
 				ForEach(scorewindData.testVideos, id: \.self) { testItem in
