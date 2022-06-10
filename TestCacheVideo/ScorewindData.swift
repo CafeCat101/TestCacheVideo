@@ -7,6 +7,7 @@
 
 import Foundation
 import AVFoundation
+import SwiftUI
 
 class ScorewindData: ObservableObject {
 	@Published var testVideos:[TestVideo] = [TestVideo()]
@@ -16,6 +17,11 @@ class ScorewindData: ObservableObject {
 	@Published var downloadList = [DownloadItem()]
 	var swDownloadTask:URLSessionDownloadTask?
 	@Published var downloadRunning = false
+	var session = URLSession.shared
+	@Published var newDownloadList:[DownloadItem] = []
+	var canceled = false
+	private var videoTask: Task<(), Error>?
+	private var newVideoTask: Task<URL?,Error>?
 	
 	init() {
 		//id2: 10MB
@@ -51,8 +57,11 @@ class ScorewindData: ObservableObject {
 				videoMP4:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.mp4",
 				videom3u8:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.m3u8")]
 		
-		currentTestVideo = testVideos[0]
-		
+		currentTestVideo = TestVideo(
+			id:4,
+			 title:"Bow Workout &#8211; Open String Playing &#8211; Violin Exercise",
+			 videoMP4:"https://scorewind.com/sw-music/pdfProject/Sheet12127/3711 12127 Bow Workout Open String Playing.mp4",
+			 videom3u8:"https://scorewind.com/sw-music/pdfProject/Sheet12127/3711_12127_Bow_Workout_Open_String_Playing.m3u8")
 		downloadList = []
 	}
 	
@@ -155,7 +164,7 @@ class ScorewindData: ObservableObject {
 	func downloadVideos() {
 		if !downloadList.isEmpty {
 			let findDownloadItemIndex = downloadList.firstIndex(where: {$0.downloadStatus == 1}) ?? -1
-
+			
 			if findDownloadItemIndex != -1 {
 				let findLesson = testVideos.first(where:{$0.id == downloadList[findDownloadItemIndex].lessonID})
 				
@@ -232,6 +241,164 @@ class ScorewindData: ObservableObject {
 		downloadList = []
 		downloadRunning = false
 	}
+	
+	func newDownload(_ url: URL, lessonID: Int) async throws -> Int {
+		print("newDownload is called")
+		do {
+			let (fileURL, _) = try await session.download(from: url)
+			
+			let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+			let destinationUrl = docsUrl!.appendingPathComponent(url.lastPathComponent)
+			print("[debug] fileURL:\(fileURL.path)")
+			print("[debug] destinationUrl:\(destinationUrl.path)")
+			try FileManager.default.moveItem(at: fileURL, to: destinationUrl)
+			print("[debug] moved to document folder.")
+			return 3
+		} catch {
+			print("newDownlaod, catch, \(error)")
+			return -1
+		}
+	}
+	
+	func newDownloadVideos() async throws {
+		for (index, item) in newDownloadList.enumerated() {
+			if canceled == true {
+				break
+			}
+			if item.downloadStatus == 1 {
+				let findLesson = testVideos.first(where:{$0.id == item.lessonID})
+				if findLesson != nil {
+					print("newDownloadVideos, lesson.videoMP4 = \(findLesson!.videoMP4)")
+					let url = URL(string: decodeVideoURL(videoURL: findLesson!.videoMP4))!
+					
+					newDownloadList[index].downloadStatus = 2
+					print("newDownloadVideos, newDownloadList[\(index)].downloadStatus \(newDownloadList[index].downloadStatus)")
+					
+					do {
+						DispatchQueue.main.async {
+							self.newDownloadList[index].downloadStatus = 2
+							print("newDownloadVideos, newDownloadList[\(index)].downloadStatus \(self.newDownloadList[index].downloadStatus)")
+						}
+						let newStatus = try await newDownload(url, lessonID: item.lessonID)
+						if canceled == true {
+							DispatchQueue.main.async {
+								self.newDownloadList[index].downloadStatus = 1
+							}
+							break
+						}
+						DispatchQueue.main.async {
+							self.newDownloadList[index].downloadStatus = newStatus
+							print("newDownloadVideos, newDownloadList[\(index)].downloadStatus \(self.newDownloadList[index].downloadStatus)")
+						}
+					} catch {
+						print("newDownloadVideos, catch,\(error)")
+					}
+				}
+			}
+		}
+	}
+	
+	func newDownloadCancel() {
+		videoTask?.cancel()
+		canceled = true
+	}
+	
+	func newnewDownloadCancel() {
+		newVideoTask?.cancel()
+	}
+	
+	func newnewDownload() async {
+		if !newDownloadList.isEmpty {
+			let targetIndex = newDownloadList.firstIndex(where: {$0.downloadStatus == 1}) ?? -1
+			
+			if targetIndex != -1 {
+				let findLesson = testVideos.first(where:{$0.id == newDownloadList[targetIndex].lessonID})
+				
+				if findLesson != nil {
+					DispatchQueue.main.async {
+						self.newDownloadList[targetIndex].downloadStatus = 2
+					}
+					print("newDownloadVideos, lesson.videoMP4 = \(findLesson!.videoMP4)")
+					let url = URL(string: decodeVideoURL(videoURL: findLesson!.videoMP4))!
+					
+					newVideoTask = Task { () -> URL? in
+						let (fileURL, _) = try await URLSession.shared.download(from: url)
+						return fileURL
+					}
+					
+					do {
+						let getFileURL = try await newVideoTask!.value!
+						let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+						let destinationUrl = docsUrl!.appendingPathComponent(url.lastPathComponent)
+						print("[debug] fileURL:\(getFileURL.path)")
+						print("[debug] destinationUrl:\(destinationUrl.path)")
+						try FileManager.default.moveItem(at: getFileURL, to: destinationUrl)
+						print("[debug] moved to document folder.")
+						
+						DispatchQueue.main.async {
+							self.newDownloadList[targetIndex].downloadStatus = 3
+						}
+						
+						print("ready to call newnewDownload again")
+						await newnewDownload()
+						
+					} catch {
+						print("newnewDownlaod, catch, \(error)")
+						DispatchQueue.main.async {
+							self.newDownloadList[targetIndex].downloadStatus = -1
+						}
+					}
+				}
+				
+			}
+			
+			
+		}
+	}
+	/*
+	func newnewDownloadVideos() async throws{
+		videoTask = Task {
+			for (index, item) in newDownloadList.enumerated() {
+				if canceled == true {
+					break
+				}
+				if item.downloadStatus == 1 {
+					let findLesson = testVideos.first(where:{$0.id == item.lessonID})
+					if findLesson != nil {
+						print("newDownloadVideos, lesson.videoMP4 = \(findLesson!.videoMP4)")
+						let url = URL(string: decodeVideoURL(videoURL: findLesson!.videoMP4))!
+						
+						newDownloadList[index].downloadStatus = 2
+						print("newDownloadVideos, newDownloadList[\(index)].downloadStatus \(newDownloadList[index].downloadStatus)")
+						
+						do {
+							DispatchQueue.main.async {
+								self.newDownloadList[index].downloadStatus = 2
+								print("newDownloadVideos, newDownloadList[\(index)].downloadStatus \(self.newDownloadList[index].downloadStatus)")
+							}
+							
+							let newStatus = try await newDownload(url, lessonID: item.lessonID)
+							
+							if canceled == true {
+								DispatchQueue.main.async {
+									self.newDownloadList[index].downloadStatus = 1
+								}
+								break
+							}
+							
+							DispatchQueue.main.async {
+								self.newDownloadList[index].downloadStatus = newStatus
+								print("newDownloadVideos, newDownloadList[\(index)].downloadStatus \(self.newDownloadList[index].downloadStatus)")
+							}
+						} catch {
+							print("newDownloadVideos, catch,\(error)")
+						}
+					}
+				}
+			}
+		}
+	}
+	 */
 }
 
 

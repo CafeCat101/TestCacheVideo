@@ -10,7 +10,6 @@ import SwiftUI
 struct ContentView: View {
 	@EnvironmentObject var scorewindData:ScorewindData
 	@State var selectedTab = "TVideos"
-	@State var downloadID = 0
 	
 	var body: some View {
 		TabView(selection: $selectedTab) {
@@ -24,22 +23,28 @@ struct ContentView: View {
 				HStack {
 					Button("Download all") {
 						print("download all")
-						if scorewindData.downloadList.isEmpty {
+						/*if scorewindData.downloadList.isEmpty {
 							for video in scorewindData.testVideos {
 								scorewindData.downloadList.append(DownloadItem(lessonID: video.id, downloadStatus: 1))
 							}
 						}
 						if !scorewindData.downloadList.isEmpty {
 							scorewindData.downloadVideos()
+						}*/
+						for video in scorewindData.testVideos {
+							scorewindData.newDownloadList.append(DownloadItem(lessonID: video.id, downloadStatus: 1))
+						}
+
+						Task {
+							print("download all Task")
+						  await scorewindData.newnewDownload()
 						}
 					}
 					
 					Spacer().frame(width:20)
-					if scorewindData.downloadRunning {
-						Button("Cancel") {
-							print("Cancel")
-							scorewindData.cancelDownloads()
-						}
+					Button("Cancel") {
+						print("Cancel")
+						scorewindData.newnewDownloadCancel()
 					}
 				}
 				
@@ -63,7 +68,14 @@ struct ContentView: View {
 							Spacer().frame(width:10)
 							Button("Download it") {
 								print("download it")
-								scorewindData.videoDownloadTask(URL(string: scorewindData.decodeVideoURL(videoURL: testItem.videoMP4))!, lessonID: testItem.id)
+								Task {
+									do {
+										try await scorewindData.newDownload(URL(string: scorewindData.decodeVideoURL(videoURL: testItem.videoMP4))!, lessonID: testItem.id)
+									} catch {
+										print("\(error)")
+									}
+								}
+								
 							}
 							
 							Spacer().frame(width:10)
@@ -128,8 +140,8 @@ struct ContentView: View {
 	private func checkDownloadStatus(lessonID:Int) -> Int {
 		//tested: view can be rerendered without placing ObservedObject in the parameter.
 		var getDownloadStatus = 0 //0:not in queue, 1:waiting, 2:downloading, 3:downloaded
-		if let findIndex = scorewindData.downloadList.firstIndex(where: {$0.lessonID == lessonID}) {
-			getDownloadStatus = scorewindData.downloadList[findIndex].downloadStatus
+		if let findIndex = scorewindData.newDownloadList.firstIndex(where: {$0.lessonID == lessonID}) {
+			getDownloadStatus = scorewindData.newDownloadList[findIndex].downloadStatus
 		}
 		return getDownloadStatus
 	}

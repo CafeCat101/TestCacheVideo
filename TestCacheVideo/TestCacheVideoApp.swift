@@ -17,20 +17,11 @@ struct TestCacheVideoApp: App {
 				.onChange(of: scenePhase, perform: { newPhase in
 					if newPhase == .active {
 						print("app is active")
-						if !scorewindData.downloadList.isEmpty {
-							//=>need to check "downloading" video, if they don't have file in document folder, mark them "in queue" so they can be downloaded again.
-							for (index, _) in scorewindData.downloadList.enumerated() {
-								if scorewindData.downloadList[index].downloadStatus == 2 {
-									scorewindData.downloadList[index].downloadStatus = 1
-								}
-							}
-							scorewindData.downloadVideos()
-						}
+						
 					} else if newPhase == .inactive {
 						print("appp is inactive")
 					} else if newPhase == .background {
 						print("app is in the background")
-						scorewindData.downloadRunning = false
 					}
 				})
 				.environmentObject(scorewindData)
