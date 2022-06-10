@@ -308,6 +308,7 @@ class ScorewindData: ObservableObject {
 	}
 	
 	func newnewDownload() async {
+		//=>the final function used in this experment. Using Task, await and async
 		if !newDownloadList.isEmpty {
 			let targetIndex = newDownloadList.firstIndex(where: {$0.downloadStatus == 1}) ?? -1
 			
