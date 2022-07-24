@@ -55,7 +55,27 @@ class ScorewindData: ObservableObject {
 				id:3,
 				title:"Introduction to &#8216;Violin Method (Demo): Basis for Even Sounding Bow Strokes&#8217;",
 				videoMP4:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.mp4",
-				videom3u8:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.m3u8")]
+				videom3u8:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.m3u8"),
+			TestVideo(
+				id:7,
+				title:"sample_no_fade",
+				videoMP4:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.mp4",
+				videom3u8:"https://scorewind.com/sw-music/temp/sample_no_fade/sample_no_fade.m3u8"),
+			TestVideo(
+				id:8,
+				title:"sample_black_filter",
+				videoMP4:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.mp4",
+				videom3u8:"https://scorewind.com/sw-music/temp/sample_black_filter/sample_black_filter.m3u8"),
+			TestVideo(
+				id:9,
+				title:"G103_direct_image_test_video1",
+				videoMP4:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.mp4",
+				videom3u8:"https://scorewind.com/sw-music/temp/G103_direct_image_test_video1/G103 direct image test video 1.m3u8"),
+			TestVideo(
+				id:10,
+				title:"G103_direct_image_test_video2",
+				videoMP4:"https://scorewind.com/wp-content/uploads/2021/02/01-Intro-Lesson-Basis-For-Even-Sounding-Bow-Strokes.mp4",
+				videom3u8:"https://scorewind.com/sw-music/temp/G103_direct_image_test_video2/G103 direct image test video 2.m3u8")]
 		
 		currentTestVideo = TestVideo(
 			id:4,

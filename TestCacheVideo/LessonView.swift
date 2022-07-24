@@ -32,7 +32,7 @@ struct LessonView: View {
 	
 	private func setupPlayer() {
 		let interval = CMTime(seconds: 0.5,preferredTimescale: CMTimeScale(NSEC_PER_SEC))
-		var playVideo = URL(string:scorewindData.currentTestVideo.videom3u8)!
+		var playVideo = URL(string:scorewindData.decodeVideoURL(videoURL:scorewindData.currentTestVideo.videom3u8))!
 		let playVideoMP4 = URL(string: scorewindData.decodeVideoURL(videoURL: scorewindData.currentTestVideo.videoMP4))!
 		
 		let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
